@@ -29,10 +29,8 @@ jobs:
       - name: Add login to copr
         if: matrix.version > 37
         run: |
-          mkdir -p "~/.config"
-          touch "~/.config/copr"
-          echo "${{ secrets.COPR_CREDENTIALS }}" >> "~/.config/copr"
-          
+          echo "${{ secrets.COPR_CREDENTIALS }}" >> "./coprConfig"
+      
       - name: Upload to COPR
         if: matrix.version > 37
-        run: copr-cli whoami
+        run: copr-cli --config "./coprConfig" whoami

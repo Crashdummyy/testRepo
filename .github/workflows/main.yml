@@ -1,0 +1,35 @@
+name: Create Release Assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      comment:
+        description: 'Bemerkung'
+        required: false
+
+jobs:  
+  buildrpms:
+    runs-on: ubuntu-latest
+    container: 
+      image: ${{ matrix.dockernamespace }}:${{ matrix.version }}
+    strategy:
+      matrix:
+        include:
+        - os: fedora
+          version: 38
+          dockernamespace: fedora
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install copr-cli
+        if: matrix.version > 37
+        run: dnf install copr-cli -y
+        
+      - name: Add login to copr
+        if: matrix.version > 37
+        run: echo "${{ secrets.COPR_CREDENTIALS }}" >> "~/.config/copr"
+          
+      - name: Upload to COPR
+        if: matrix.version > 37
+        run: copr-cli whoami
